@@ -52,6 +52,26 @@ const gameBoard = ( function() {
         return boardArray;
     }
 
+    // Parse board array into a string
+    function getBoardString() {
+        let boardString = "";
+        for (let row = 0; row < ROWS; row++) {
+            // board[row] = [];
+            for (let col = 0; col < COLS; col++) {
+                boardString += boardArray[row][col];
+                // board[row][col] = null;
+                boardString += " "
+            }
+            // Jump line
+            boardString += "\n";
+        }
+        return boardString;
+    }
+
+    // Display Board string
+    function logBoardString() {
+        console.log(getBoardString())
+    }
 
     // Place marker (xy, marker)
         // Check if xy available
@@ -104,6 +124,8 @@ function createPlayer({name, marker}) {
 const diego = createPlayer({marker: "x", name: "diego"});
 const ana = createPlayer({name: "ana", marker: "o"});
 
-gameBoard.getBoardArray()
-gameBoard.createBoardArray()
-gameBoard.getBoardArray()
+gameBoard.getBoardArray();
+gameBoard.createBoardArray();
+gameBoard.getBoardArray();
+
+gameBoard.logBoardString();
