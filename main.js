@@ -28,7 +28,30 @@ log("hello world");
     // Clear board. Finish game
 
 // Board Object: controls the board, data and functionality
-    // Create board
+const gameBoard = ( function() {
+    
+    // Rows and Columns constant values
+    const ROWS = 3;
+    const COLS = 3;
+
+    // Game board array
+    let boardArray = [];
+
+    // Create boardArray
+    function createBoardArray() {
+        for (let row = 0; row < ROWS; row++) {
+            boardArray[row] = [];
+            for (let col = 0; col < COLS; col++) {
+                boardArray[row][col] = null;
+            }
+        }
+    }
+
+    // Get boardArray array
+    function getBoardArray() {
+        return boardArray;
+    }
+
 
     // Place marker (xy, marker)
         // Check if xy available
@@ -57,6 +80,9 @@ log("hello world");
         // elif center
     // Check full board
 
+    return {createBoardArray, getBoardArray, logBoardString}
+} )();
+
 // Player Object: contains the player data and functionality
 function createPlayer({name, marker}) {
     // const marker = marker;
@@ -77,3 +103,7 @@ function createPlayer({name, marker}) {
 
 const diego = createPlayer({marker: "x", name: "diego"});
 const ana = createPlayer({name: "ana", marker: "o"});
+
+gameBoard.getBoardArray()
+gameBoard.createBoardArray()
+gameBoard.getBoardArray()
