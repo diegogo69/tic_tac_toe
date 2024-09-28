@@ -37,6 +37,13 @@ log("hello world");
         // Else
             // return false? keep asking for a valid xy
 
+    // Display board
+        // board string
+        // for row x
+            // for column y
+                // board += marker
+        // print board string
+
 
     // Check winner
         // Check row
@@ -51,5 +58,22 @@ log("hello world");
     // Check full board
 
 // Player Object: contains the player data and functionality
+function createPlayer({name, marker}) {
+    // const marker = marker;
+    // const name = name;
+
     // Marker
+    function getMarker() {
+        return marker;
+    }
+
     // Name
+    function getName() {
+        return name;
+    }
+    
+    return {getMarker, getName}   
+}
+
+const diego = createPlayer({marker: "x", name: "diego"});
+const ana = createPlayer({name: "ana", marker: "o"});
