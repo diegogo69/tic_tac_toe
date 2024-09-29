@@ -38,14 +38,14 @@ const gameBoard = ( function() {
     let boardArray = [];
 
     // Create boardArray
-    function createBoardArray() {
+    function defaultBoardArray() {
         for (let row = 0; row < BOARD_SIZE; row++) {
             boardArray[row] = [];
             for (let col = 0; col < BOARD_SIZE; col++) {
                 boardArray[row][col] = null;
             }
         }
-    }
+    }    
 
     // Get boardArray array
     function getBoardArray() {
@@ -150,7 +150,7 @@ const gameBoard = ( function() {
     }
 
     return {
-        createBoardArray, getBoardArray, logBoardString,
+        defaultBoardArray, getBoardArray, logBoardString,
         placeMarker, checkWinner,
     }
 } )();
@@ -177,7 +177,7 @@ const diego = createPlayer({marker: "x", name: "diego"});
 const ana = createPlayer({name: "ana", marker: "o"});
 
 gameBoard.getBoardArray();
-gameBoard.createBoardArray();
+gameBoard.defaultBoardArray();
 gameBoard.getBoardArray();
 
 // gameBoard.logBoardString();
