@@ -2,37 +2,99 @@ const log = console.log;
 log("hello world");
 
 // Play Game
+const game = ( function() {
+    let turn;
+    let players;
     // Setup Game
-        // Select player
+    function setupGame() { 
+        // Select players
+        players = selectPlayers();
         // Select turn
+        turn = selectTurn()
         // Make board
+        gameBoard.defaultBoardArray();
+    }
+
+    function selectPlayers() {
+        // Select players name 
+        const p1Name = prompt("P1 name: ");
+        const p2Name = prompt("P2 name: ");
+        
+        // Select marker
+        const marker = selectMarker();
+        // Set markers
+        const p1Marker = (marker == "1" || marker == "x") ? "x" : "o";
+        const p2Marker = (marker == "1" || marker == "x") ? "o" : "x";
+        
+        const p1 = createPlayer({ name: p1Name, marker: p1Marker })
+        const p2 = createPlayer({ name: p2Name, marker: p2Marker })
+        return {p1, p2}
+    }
+
+    function selectMarker() {
+        let marker;
+        do {
+            marker = prompt(
+                `${"Player one"} choose a marker:\n
+                1. x
+                2. o`).toLowerCase();
+        } while (marker != "1" && marker != "2" && marker != "o" && marker != "x");
+        return marker
+    }
+
+    function selectTurn() {
+        do {
+            turn = prompt(
+                `Who marks first? Enter an option (1 or 2)\n
+                1. Player 1
+                2. Player 2`).toLowerCase();
+        } while (turn != 1 && turn != 2);
+        return `p${turn}`;
+    }
+
+    function promptPlace() {
+        // Declare spot variable (YX coordinates)
+        let spot;
+        // Declare valid spot expression
+        const validSpot = (spot) => ( spot >= 0 && spot <= 2 );
+        do {
+            spot = prompt(`Enter spot place in XY format (e.g 00): `);
+        } while (!validSpot(spot[0]) && !validSpot(spot[1]));
+
+        return [(parseInt(spot[0])), (parseInt(spot[1]))];
+        }
 
     // Playround
+    function playGame() {
+        while (true) {
+            gameBoard.logBoardString();
+            let marker =  (turn == "p1") ? players.p1.getMarker() : players.p2.getMarker();
+            // let y, x;
+            let [y, x] = promptPlace();
+            gameBoard.placeMarker( {marker, x, y} );
 
-// Game Object: controls flow of the game
-    // While true
-        // If turn = 0
-            // Player 1 place marker
-        // else if turn 1
-            // Player 2 place marker
+            if (gameBoard.checkWinner({x, y})) {
+                log(`${players[turn].getName()} Wins!!!!`);
+                return;
+            };
 
-        // Check winner
-        // If winner
-            // Declare winner
+            if (gameBoard.checkTie()) {
+                log("Ohh, it's a TIE!!!")
+                return;
+            };
 
-        // Check full board
-        // If fullboard
-            // Declare tie
-        
-        // Change turn
-    // Clear board. Finish game
+            turn = (turn == "p1") ? "p2" : "p1";
+        }
+    }
+    
+    return { setupGame, playGame }
+} )();
 
 // Board Object: controls the board, data and functionality
 const gameBoard = ( function() {
     
     // Rows and Columns constant values
     const BOARD_SIZE = 3;
-    const CROSS = 3;
 
     // Game board array
     let boardArray = [];
@@ -97,13 +159,25 @@ const gameBoard = ( function() {
         return false
     }
 
+    function checkTie() {
+        for (let row = 0; row < BOARD_SIZE; row++) {
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                if (boardArray[row][col] === null) { return false };
+            }
+        }
+        return true;
+    }
+
     // Check winner
     checkCross = {
         row( {y} ) {
             // Check full row for 3 sucesive spots in a row
-            for (let spot = 0; spot < BOARD_SIZE - 1; spot++) {
+            for (let x = 0; x < BOARD_SIZE - 1; x++) {
+                let currentSpot = boardArray[y][x];
+                let nextSpot = boardArray[y][x + 1];
+                
                 // current spot is equal to next spot
-                let sucesiveSpots = (boardArray[y][spot] === boardArray[y][spot + 1]);
+                let sucesiveSpots = (currentSpot !== null && currentSpot === nextSpot);
                 // if not sucesive spots return false
                 if (!sucesiveSpots) { return false }
             }
@@ -113,9 +187,13 @@ const gameBoard = ( function() {
     
         column( {x} ) {
             // Check full column for 3 sucesive spots in a row
-            for (let spot = 0; spot < BOARD_SIZE - 1; spot++) {
+            for (let y = 0; y < BOARD_SIZE - 1; y++) {
+                let currentSpot = boardArray[y][x];
+                let nextSpot = boardArray[y + 1][x];
+
                 // current spot is equal to next spot
-                let sucesiveSpots = (boardArray[spot][x] === boardArray[spot + 1][x]);
+                let sucesiveSpots = (currentSpot !== null && currentSpot === nextSpot);
+
                 // if not sucesive spots return false
                 if (!sucesiveSpots) { return false }
             }
@@ -125,9 +203,13 @@ const gameBoard = ( function() {
     
         diagonalDR() {
             // Check full column for 3 sucesive spots in a row
-            for (let spot = 0; spot < BOARD_SIZE - 1; spot++) {
+            for (let xy = 0; xy < BOARD_SIZE - 1; xy++) {
+                let currentSpot = boardArray[xy][xy];
+                let nextSpot = boardArray[xy + 1][xy + 1];
+
                 // current spot is equal to next spot
-                let sucesiveSpots = (boardArray[spot][spot] === boardArray[spot + 1][spot + 1]);
+                let sucesiveSpots = (currentSpot !== null && currentSpot === nextSpot);
+
                 // if not sucesive spots return false
                 if (!sucesiveSpots) { return false }
             }
@@ -137,10 +219,15 @@ const gameBoard = ( function() {
     
         diagonalDL() {
             // Check full column for 3 sucesive spots in a row
-            for (let spot = 0; spot < BOARD_SIZE; spot++) {
-                let x = (BOARD_SIZE - 1) - spot;
+            for (let y = 0; y < BOARD_SIZE - 1; y++) {
+                let x = (BOARD_SIZE - 1) - y;
+
+                let currentSpot = boardArray[y][x];
+                let nextSpot = boardArray[y + 1][x - 1];
+
                 // current spot is equal to next spot
-                let sucesiveSpots = (boardArray[spot][x] === boardArray[spot + 1][x - 1]);
+                let sucesiveSpots = (currentSpot !== null && currentSpot === nextSpot);
+
                 // if not sucesive spots return false
                 if (!sucesiveSpots) { return false }
             }
@@ -151,14 +238,12 @@ const gameBoard = ( function() {
 
     return {
         defaultBoardArray, getBoardArray, logBoardString,
-        placeMarker, checkWinner,
+        placeMarker, checkWinner, checkTie,
     }
 } )();
 
 // Player Object: contains the player data and functionality
 function createPlayer({name, marker}) {
-    // const marker = marker;
-    // const name = name;
 
     // Marker
     function getMarker() {
@@ -173,12 +258,16 @@ function createPlayer({name, marker}) {
     return {getMarker, getName}   
 }
 
-const diego = createPlayer({marker: "x", name: "diego"});
-const ana = createPlayer({name: "ana", marker: "o"});
+let players;
+game.setupGame();
+game.playGame();
 
-gameBoard.getBoardArray();
-gameBoard.defaultBoardArray();
-gameBoard.getBoardArray();
+// const diego = createPlayer({marker: "x", name: "diego"});
+// const ana = createPlayer({name: "ana", marker: "o"});
+
+// gameBoard.getBoardArray();
+// gameBoard.defaultBoardArray();
+// gameBoard.getBoardArray();
 
 // gameBoard.logBoardString();
 // gameBoard.placeMarker({marker: "a", x: 1, y: 1,});
@@ -189,8 +278,8 @@ gameBoard.getBoardArray();
 // gameBoard.logBoardString();
 // log(gameBoard.checkWinner({x: 1, y: 1 }))
 
-gameBoard.placeMarker({marker: "x", x: 1, y: 1,});
-gameBoard.placeMarker({marker: "x", x: 0, y: 0,});
+// gameBoard.placeMarker({marker: "x", x: 1, y: 1,});
+// gameBoard.placeMarker({marker: "x", x: 0, y: 0,});
 // gameBoard.placeMarker({marker: "x", x: 2, y: 2,});
-gameBoard.logBoardString();
-log(gameBoard.checkWinner({x: 1, y: 1 }))
+// gameBoard.logBoardString();
+// log(gameBoard.checkWinner({x: 1, y: 1 }))
