@@ -148,12 +148,21 @@ const gameBoard = ( function() {
     }
 
     function checkWinner({x, y}) {
-        if (boardArray[y][x] === null) {return false}
-
+        // current spot is equal to next spot
+        const sucesiveSpots = (currentSpot, nextSpot) => (currentSpot !== null && currentSpot === nextSpot);
+        // For each method in checkCross (row, colum, diagonal)
         for (let prop in checkCross) {
-            if (checkCross[prop]({x, y})) {
+            let streak = 1;
+            for (let i = 0; i < BOARD_SIZE -1; i++) {
+                // Pass current iteration to check sucesive spots
+                let [current, next] =  checkCross[prop]({x, y, i});
+                if (!sucesiveSpots(current, next)) { break }
+                streak += 1;
+            }
+            if (streak === 3) { 
                 log(`Win by ${prop}`);
-                return true }
+                return true
+            }
         }
         log(`Not win`);
         return false
@@ -170,69 +179,33 @@ const gameBoard = ( function() {
 
     // Check winner
     checkCross = {
-        row( {y} ) {
-            // Check full row for 3 sucesive spots in a row
-            for (let x = 0; x < BOARD_SIZE - 1; x++) {
-                let currentSpot = boardArray[y][x];
-                let nextSpot = boardArray[y][x + 1];
-                
-                // current spot is equal to next spot
-                let sucesiveSpots = (currentSpot !== null && currentSpot === nextSpot);
-                // if not sucesive spots return false
-                if (!sucesiveSpots) { return false }
-            }
-            // Up this point means 3 in a row
-            return true;
+        // Check full row for 3 sucesive spots in a row
+        row( {y, i} ) {
+                let x = i;
+                // return Current Spot and Next Spot
+                return [boardArray[y][x], boardArray[y][x + 1]];
         },
     
-        column( {x} ) {
-            // Check full column for 3 sucesive spots in a row
-            for (let y = 0; y < BOARD_SIZE - 1; y++) {
-                let currentSpot = boardArray[y][x];
-                let nextSpot = boardArray[y + 1][x];
-
-                // current spot is equal to next spot
-                let sucesiveSpots = (currentSpot !== null && currentSpot === nextSpot);
-
-                // if not sucesive spots return false
-                if (!sucesiveSpots) { return false }
-            }
-            // Up this point means 3 in a row
-            return true;
+        // Check full column for 3 sucesive spots in a row
+        column( {x, i} ) {
+            let y = i;
+            // return Current Spot and Next Spot
+            return [boardArray[y][x], boardArray[y + 1][x]];
         },
     
-        diagonalDR() {
-            // Check full column for 3 sucesive spots in a row
-            for (let xy = 0; xy < BOARD_SIZE - 1; xy++) {
-                let currentSpot = boardArray[xy][xy];
-                let nextSpot = boardArray[xy + 1][xy + 1];
-
-                // current spot is equal to next spot
-                let sucesiveSpots = (currentSpot !== null && currentSpot === nextSpot);
-
-                // if not sucesive spots return false
-                if (!sucesiveSpots) { return false }
-            }
-            // Up this point means 3 in a row
-            return true;
+        // Check full column for 3 sucesive spots in a row
+        diagonalDR({i}) {
+            let xy = i;
+            // return Current Spot and Next Spot
+            return [boardArray[xy][xy], boardArray[xy + 1][xy + 1]];
         },
     
-        diagonalDL() {
-            // Check full column for 3 sucesive spots in a row
-            for (let y = 0; y < BOARD_SIZE - 1; y++) {
-                let x = (BOARD_SIZE - 1) - y;
-
-                let currentSpot = boardArray[y][x];
-                let nextSpot = boardArray[y + 1][x - 1];
-
-                // current spot is equal to next spot
-                let sucesiveSpots = (currentSpot !== null && currentSpot === nextSpot);
-
-                // if not sucesive spots return false
-                if (!sucesiveSpots) { return false }
-            }
-            // Up this point means 3 in a row
-            return true;
+        // Check full column for 3 sucesive spots in a row
+        diagonalDL({i}) {
+            let y = i;
+            let x = (BOARD_SIZE - 1) - y;
+            // return Current Spot and Next Spot
+            return [boardArray[y][x], boardArray[y + 1][x - 1]];
         },
     }
 
@@ -261,25 +234,3 @@ function createPlayer({name, marker}) {
 let players;
 game.setupGame();
 game.playGame();
-
-// const diego = createPlayer({marker: "x", name: "diego"});
-// const ana = createPlayer({name: "ana", marker: "o"});
-
-// gameBoard.getBoardArray();
-// gameBoard.defaultBoardArray();
-// gameBoard.getBoardArray();
-
-// gameBoard.logBoardString();
-// gameBoard.placeMarker({marker: "a", x: 1, y: 1,});
-// gameBoard.logBoardString();
-
-// gameBoard.placeMarker({marker: "o", x: 0, y: 0,});
-// gameBoard.placeMarker({marker: "x", x: 2, y: 2,});
-// gameBoard.logBoardString();
-// log(gameBoard.checkWinner({x: 1, y: 1 }))
-
-// gameBoard.placeMarker({marker: "x", x: 1, y: 1,});
-// gameBoard.placeMarker({marker: "x", x: 0, y: 0,});
-// gameBoard.placeMarker({marker: "x", x: 2, y: 2,});
-// gameBoard.logBoardString();
-// log(gameBoard.checkWinner({x: 1, y: 1 }))
