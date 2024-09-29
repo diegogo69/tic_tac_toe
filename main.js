@@ -31,17 +31,17 @@ log("hello world");
 const gameBoard = ( function() {
     
     // Rows and Columns constant values
-    const ROWS = 3;
-    const COLS = 3;
+    const BOARD_SIZE = 3;
+    const CROSS = 3;
 
     // Game board array
     let boardArray = [];
 
     // Create boardArray
     function createBoardArray() {
-        for (let row = 0; row < ROWS; row++) {
+        for (let row = 0; row < BOARD_SIZE; row++) {
             boardArray[row] = [];
-            for (let col = 0; col < COLS; col++) {
+            for (let col = 0; col < BOARD_SIZE; col++) {
                 boardArray[row][col] = null;
             }
         }
@@ -55,11 +55,11 @@ const gameBoard = ( function() {
     // Parse board array into a string
     function getBoardString() {
         let boardString = "";
-        for (let row = 0; row < ROWS; row++) {
-            // board[row] = [];
-            for (let col = 0; col < COLS; col++) {
-                boardString += boardArray[row][col];
-                // board[row][col] = null;
+        for (let y = 0; y < BOARD_SIZE; y++) {
+            // board[y] = [];
+            for (let x = 0; x < BOARD_SIZE; x++) {
+                boardString += boardArray[y][x];
+                // board[row][x] = null;
                 boardString += " "
             }
             // Jump line
@@ -74,33 +74,85 @@ const gameBoard = ( function() {
     }
 
     // Place marker (xy, marker)
-        // Check if xy available
-        // If available
-            // xy = marker
-        // Else
-            // return false? keep asking for a valid xy
+    function placeMarker({marker, x, y}) {
+        // Check if spot available
+        if (boardArray[y][x] === null) {
+            boardArray[y][x] = marker;
+            // Spot available and marked
+            return true;
+        }
+        // Spot not available, not marked
+        return false;
+    }
 
-    // Display board
-        // board string
-        // for row x
-            // for column y
-                // board += marker
-        // print board string
+    function checkWinner({x, y}) {
+        if (boardArray[y][x] === null) {return false}
 
+        for (let prop in checkCross) {
+            if (checkCross[prop]({x, y})) {
+                log(`Win by ${prop}`);
+                return true }
+        }
+        log(`Not win`);
+        return false
+    }
 
     // Check winner
-        // Check row
-        // Check column
-        // Check Diagonal Down right / Down left
-            // diagonal.downRight
-            // diagonal.downLeft
+    checkCross = {
+        row( {y} ) {
+            // Check full row for 3 sucesive spots in a row
+            for (let spot = 0; spot < BOARD_SIZE - 1; spot++) {
+                // current spot is equal to next spot
+                let sucesiveSpots = (boardArray[y][spot] === boardArray[y][spot + 1]);
+                // if not sucesive spots return false
+                if (!sucesiveSpots) { return false }
+            }
+            // Up this point means 3 in a row
+            return true;
+        },
+    
+        column( {x} ) {
+            // Check full column for 3 sucesive spots in a row
+            for (let spot = 0; spot < BOARD_SIZE - 1; spot++) {
+                // current spot is equal to next spot
+                let sucesiveSpots = (boardArray[spot][x] === boardArray[spot + 1][x]);
+                // if not sucesive spots return false
+                if (!sucesiveSpots) { return false }
+            }
+            // Up this point means 3 in a row
+            return true;
+        },
+    
+        diagonalDR() {
+            // Check full column for 3 sucesive spots in a row
+            for (let spot = 0; spot < BOARD_SIZE - 1; spot++) {
+                // current spot is equal to next spot
+                let sucesiveSpots = (boardArray[spot][spot] === boardArray[spot + 1][spot + 1]);
+                // if not sucesive spots return false
+                if (!sucesiveSpots) { return false }
+            }
+            // Up this point means 3 in a row
+            return true;
+        },
+    
+        diagonalDL() {
+            // Check full column for 3 sucesive spots in a row
+            for (let spot = 0; spot < BOARD_SIZE; spot++) {
+                let x = (BOARD_SIZE - 1) - spot;
+                // current spot is equal to next spot
+                let sucesiveSpots = (boardArray[spot][x] === boardArray[spot + 1][x - 1]);
+                // if not sucesive spots return false
+                if (!sucesiveSpots) { return false }
+            }
+            // Up this point means 3 in a row
+            return true;
+        },
+    }
 
-        // if corner
-        // elif midside
-        // elif center
-    // Check full board
-
-    return {createBoardArray, getBoardArray, logBoardString}
+    return {
+        createBoardArray, getBoardArray, logBoardString,
+        placeMarker, checkWinner,
+    }
 } )();
 
 // Player Object: contains the player data and functionality
@@ -128,4 +180,17 @@ gameBoard.getBoardArray();
 gameBoard.createBoardArray();
 gameBoard.getBoardArray();
 
+// gameBoard.logBoardString();
+// gameBoard.placeMarker({marker: "a", x: 1, y: 1,});
+// gameBoard.logBoardString();
+
+// gameBoard.placeMarker({marker: "o", x: 0, y: 0,});
+// gameBoard.placeMarker({marker: "x", x: 2, y: 2,});
+// gameBoard.logBoardString();
+// log(gameBoard.checkWinner({x: 1, y: 1 }))
+
+gameBoard.placeMarker({marker: "x", x: 1, y: 1,});
+gameBoard.placeMarker({marker: "x", x: 0, y: 0,});
+// gameBoard.placeMarker({marker: "x", x: 2, y: 2,});
 gameBoard.logBoardString();
+log(gameBoard.checkWinner({x: 1, y: 1 }))
