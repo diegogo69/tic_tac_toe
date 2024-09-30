@@ -213,3 +213,27 @@ summary {
 }
 
 /* MINE */
+* {
+	margin: 0;
+	padding: 0;
+}
+
+ul {
+	list-style: none;
+}
+
+.grid-container {
+	width: 400px;
+	height: 400px;
+	background-color: red;
+
+	display: grid;
+	grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr;
+	gap: 5px;
+}
+
+.spot {
+	background-color: white;
+	display: grid;
+	place-content: center;
+}

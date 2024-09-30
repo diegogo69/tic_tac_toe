@@ -9,6 +9,50 @@
     <script src="main.js" defer></script>
 </head>
 <body>
+    <header>
+        La Vieja
+    </header>    
+
+    <main>
+        <div class="grid-container">
+            <div class="spot" data-index="00">x</div>
+            <div class="spot" data-index="01">x</div>
+            <div class="spot" data-index="02">o</div>
+            <div class="spot" data-index="10">x</div>
+            <div class="spot" data-index="11">x</div>
+            <div class="spot" data-index="12">x</div>
+            <div class="spot" data-index="20">x</div>
+            <div class="spot" data-index="21">o</div>
+            <div class="spot" data-index="22">x</div>
+        </div>
+
+        <div class="play-game-wrapper">
+            <button class="btn-play">Play</button>
+
+            <form class="game-mode-form">
+                <h3>Player vs Computer</h3>
+                <input type="hidden" name="game-mode" value="two-players">
+            </form>
+
+
+            <form class="game-mode-form">
+                <ul>
+                    <li>
+                        <label for="p1-name">Player 1</label>
+                        <input type="text" name="p1-name" id="p1-name" value="Player 1">
+                    </li>
+                    <li>
+                        <label for="p2-name">Player 2</label>
+                        <input type="text" name="p2-name" id="p2-name" value="Player 2">
+                    </li>
+                </ul>
+                <input type="hidden" name="game-mode" value="two-players">
+            </form>
+        </div>
+    </main>
+
+    <footer>
     
+    </footer>
 </body>
 </html>
