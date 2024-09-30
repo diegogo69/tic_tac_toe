@@ -1,94 +1,10 @@
 const log = console.log;
 log("hello world");
 
-// Play Game
-const game = ( function() {
-    let turn;
-    let players;
-    // Setup Game
-    function setupGame() { 
-        // Select players
-        players = selectPlayers();
-        // Select turn
-        turn = selectTurn()
-        // Make board
-        gameBoard.defaultBoardArray();
-    }
+let players;
+const grid = document.querySelector(".grid-container");
+const spots = grid.querySelectorAll(".spot");
 
-    function selectPlayers() {
-        // Select players name 
-        const p1Name = prompt("P1 name: ");
-        const p2Name = prompt("P2 name: ");
-        
-        // Select marker
-        const marker = selectMarker();
-        // Set markers
-        const p1Marker = (marker == "1" || marker == "x") ? "x" : "o";
-        const p2Marker = (marker == "1" || marker == "x") ? "o" : "x";
-        
-        const p1 = createPlayer({ name: p1Name, marker: p1Marker })
-        const p2 = createPlayer({ name: p2Name, marker: p2Marker })
-        return {p1, p2}
-    }
-
-    function selectMarker() {
-        let marker;
-        do {
-            marker = prompt(
-                `${"Player one"} choose a marker:\n
-                1. x
-                2. o`).toLowerCase();
-        } while (marker != "1" && marker != "2" && marker != "o" && marker != "x");
-        return marker
-    }
-
-    function selectTurn() {
-        do {
-            turn = prompt(
-                `Who marks first? Enter an option (1 or 2)\n
-                1. Player 1
-                2. Player 2`).toLowerCase();
-        } while (turn != 1 && turn != 2);
-        return `p${turn}`;
-    }
-
-    function promptPlace() {
-        // Declare spot variable (YX coordinates)
-        let spot;
-        // Declare valid spot expression
-        const validSpot = (spot) => ( spot >= 0 && spot <= 2 );
-        do {
-            spot = prompt(`Enter spot place in XY format (e.g 00): `);
-        } while (!validSpot(spot[0]) && !validSpot(spot[1]));
-
-        return [(parseInt(spot[0])), (parseInt(spot[1]))];
-        }
-
-    // Playround
-    function playGame() {
-        while (true) {
-            gameBoard.logBoardString();
-            let marker =  (turn == "p1") ? players.p1.getMarker() : players.p2.getMarker();
-            // let y, x;
-            let [y, x] = promptPlace();
-            gameBoard.placeMarker( {marker, x, y} );
-
-            if (gameBoard.checkWinner({x, y})) {
-                log(`${players[turn].getName()} Wins!!!!`);
-                return;
-            };
-
-            if (gameBoard.checkTie()) {
-                log("Ohh, it's a TIE!!!")
-                return;
-            };
-
-            turn = (turn == "p1") ? "p2" : "p1";
-        }
-    }
-    
-    return { setupGame, playGame }
-} )();
 
 // Board Object: controls the board, data and functionality
 const gameBoard = ( function() {
@@ -130,9 +46,29 @@ const gameBoard = ( function() {
         return boardString;
     }
 
-    // Display Board string
+    // Log Board string
     function logBoardString() {
         console.log(getBoardString())
+    }
+
+    function getClickCoordinates(event) {
+        let yx = event.target.dataset["index"];
+        return [ (parseInt(yx[0])), (parseInt(yx[1])) ];
+    }
+
+    // Display board string
+    function displayBoardArray() {
+        for (let y = 0; y < BOARD_SIZE; y++) {
+            for (let x = 0; x < BOARD_SIZE; x++) {
+                // parse two dimensional index of boardArray to 1 dimensional index
+                // BOARD_SIZE * 0 = 0 -> 0 + 0 | 0 + 1 | 0 + 2
+                // BOARD_SIZE * 1 = 3 -> 3 + 0 | 3 + 1 | 3 + 2
+                // BOARD_SIZE * 2 = 6 -> 6 + 0 | 6 + 1 | 6 + 2
+                let spot = spots[BOARD_SIZE * y + x];
+
+                spot.textContent = boardArray[y][x];
+            }
+        }
     }
 
     // Place marker (xy, marker)
@@ -210,8 +146,9 @@ const gameBoard = ( function() {
     }
 
     return {
-        defaultBoardArray, getBoardArray, logBoardString,
+        defaultBoardArray, getBoardArray, getClickCoordinates,
         placeMarker, checkWinner, checkTie,
+        displayBoardArray, logBoardString, 
     }
 } )();
 
@@ -229,8 +166,142 @@ function createPlayer({name, marker}) {
     }
     
     return {getMarker, getName}   
-}
+};
 
-let players;
-game.setupGame();
-game.playGame();
+
+// Play Game
+const game = ( function() {
+    let turn;
+    let players;
+    // Setup Game
+    function setupGame() { 
+        // Select players
+        players = selectPlayers();
+        // Select turn
+        turn = selectTurn()
+        // Make board
+        gameBoard.defaultBoardArray();
+        gameBoard.displayBoardArray();
+        gameBoard.logBoardString();
+    }
+
+    function selectPlayers() {
+        // Select players name 
+        let p1Name = prompt("P1 name: ");
+        if (!p1Name) { p1Name = "Player 1" }
+        let p2Name = prompt("P2 name: ");
+        if (!p2Name) { p2Name = "Player 2" }
+        
+        // Select marker
+        const marker = selectMarker();
+        // Set markers
+        const p1Marker = (marker == "1" || marker == "x") ? "x" : "o";
+        const p2Marker = (marker == "1" || marker == "x") ? "o" : "x";
+        
+        const p1 = createPlayer({ name: p1Name, marker: p1Marker })
+        const p2 = createPlayer({ name: p2Name, marker: p2Marker })
+        return {p1, p2}
+    }
+
+    function selectMarker() {
+        let marker;
+        do {
+            marker = prompt(
+                `${"Player one"} choose a marker:\n
+                1. x
+                2. o`);
+                if ( !marker ) { marker = "x" }
+        } while ( !marker.match(/^[xo12]/i) );
+        return marker
+    }
+
+    function selectTurn() {
+        do {
+            turn = prompt(
+                `Who marks first? Enter an option (1 or 2)\n
+                1. Player 1
+                2. Player 2`);
+            if ( !turn ) { turn = "1" }
+        } while (turn != 1 && turn != 2);
+        return turn;
+    }
+
+    function promptPlace() {
+        // Declare spot variable (YX coordinates)
+        let spot;
+        // Declare valid spot expression
+        const validSpot = (x) => ( x >= 0 && x <= 2 );
+        do {
+            spot = prompt(`Enter spot place in XY format (e.g 00): `);
+        } while ( !(validSpot(spot[0]) && validSpot(spot[1])) );
+
+        return [(parseInt(spot[0])), (parseInt(spot[1]))];
+        }
+
+    // Playround
+    function playRound( {x, y} ) {
+        let marker = players[`p${turn}`].marker;
+
+        gameBoard.placeMarker( {marker, x, y} );
+        gameBoard.displayBoardArray();
+        gameBoard.logBoardString();
+
+        let result;
+        if (gameBoard.checkWinner({x, y})) {
+            result = `${players[`p${turn}`].getName()} Wins!!!!`;
+        }
+
+        else if (gameBoard.checkTie()) {
+            result = "Ohh, it's a TIE!!!";
+        };
+
+        turn = (turn == 1) ? 2 : 1;
+        return result;      
+    }
+
+    function playGame() {
+        gameBoard.displayBoardArray();
+        gameBoard.logBoardString();
+
+        while (!result) {
+            let marker =  (turn == 1) ? players.p1.getMarker() : players.p2.getMarker();
+            // let y, x;
+            let [y, x] = promptPlace();
+            gameBoard.placeMarker( {marker, x, y} );
+            gameBoard.logBoardString();
+
+            if (gameBoard.checkWinner({x, y})) {
+                log(`${players[`p${turn}`].getName()} Wins!!!!`);
+                return;
+            };
+
+            if (gameBoard.checkTie()) {
+                log("Ohh, it's a TIE!!!")
+                return;
+            };
+
+            turn = (turn == 1) ? 2 : 1;
+        }
+        
+    }
+    
+    return { setupGame, playGame, playRound }
+} )();
+
+
+// game.setupGame();
+// game.playGame();
+
+game.setupGame()
+
+spots.forEach((spot) => ( spot.addEventListener('click', (event) => {
+    let [y, x] = gameBoard.getClickCoordinates(event);
+    let result = game.playRound( {y, x} );
+
+    if (result) {
+        log(result);
+        alert(result);
+    }
+
+    })
+));
