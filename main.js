@@ -172,12 +172,10 @@ function createPlayer({name, marker}) {
     function getMarker() {
         return marker;
     }
-
     // Name
     function getName() {
         return name;
     }
-    
     return {getMarker, getName}   
 };
 
@@ -185,15 +183,21 @@ function createPlayer({name, marker}) {
 // Play Game
 const game = ( function() {
     let turn;
+    let players;
+    let modePvP;
     // Setup Game
-    function setupGame() { 
+    function setupGame( { p1, p2, pvp } ) { 
         // Select players
-        players = selectPlayers();
+        // players = selectPlayers();
+        players = { p1, p2 };
+        modePvP =  pvp;
         // Select turn
-        turn = selectTurn()
+        // turn = selectTurn()
+        turn = Math.floor( Math.random() + 1 );
         // Make board
         gameBoard.defaultBoardArray();
         gameBoard.displayBoardArray();
+        gameDOM.turnBoard();
         gameBoard.logBoardString();
     }
 
@@ -273,7 +277,7 @@ const game = ( function() {
         gameBoard.logBoardString();
 
 
-        let result;
+        // let result;
         if (gameBoard.checkWinner({x, y})) {
             result = `${players[`p${turn}`].getName()} Wins!!!!`;
         }
@@ -310,29 +314,69 @@ const game = ( function() {
             turn = (turn == 1) ? 2 : 1;
         }
     }
+
+    // DOM 
+    function spotEventHandler(event) {
+        if (result) { return }
+                
+        result = game.playTurn( event );
     
-    return { setupGame, playGame, playTurn, }
+        // If not win and Computer's turn
+        if (!result && !modePvP) {
+            result = game.playTurn();
+        }
+        // Inmediate computer turn
+        if (result) {
+            log(result);
+            alert(result);
+        }
+    }    
+    
+    return { setupGame, playGame, playTurn, spotEventHandler }
 } )();
 
-
-game.setupGame()
 let result;
-let modeAI;
-modeAI = true;
-spots.forEach((spot) => ( spot.addEventListener('click', (event) => {
-    if (result) { return }
-    
-    result = game.playTurn( event );
+// game.setupGame()
+// let result;
+// let modeAI;
+// modeAI = true;
 
-    // If not win and Computer's turn
-    if (modeAI && !result) {
-        result = game.playTurn();
-    }
-    // Inmediate computer turn
-    if (result) {
-        log(result);
-        alert(result);
+
+const gameDOM = ( function() {
+    function turnBoard() {
+        spots.forEach( (spot) => (
+            spot.addEventListener('click', (event) => game.spotEventHandler(event))
+        ) );
     }
 
-    })
-));
+    // Setup PvP
+    // Listen play button
+    const btnPlayPvP = document.querySelector('#btnPlayPvP');
+    const formPlayPvP = document.querySelector('#formPlayPvP');
+    btnPlayPvP.addEventListener('click', event => {
+
+        event.preventDefault();
+
+        // Get players name
+        let p1Name = formPlayPvP.querySelector('#p1Name');
+        let p2Name = formPlayPvP.querySelector('#p2Name');
+
+        if (!p1Name) { p1Name = "Player 1"};
+        if (!p2Name) { p2Name = "Player 2"};
+
+        const p1 = createPlayer({ name: p1Name, marker: "x" });
+        const p2 = createPlayer({ name: p2Name, marker: "o" });
+
+        let pvp = true;
+
+        game.setupGame( {p1, p2, pvp} );
+        
+    });
+
+    return {
+        turnBoard,
+    }
+
+} )()
+
+
