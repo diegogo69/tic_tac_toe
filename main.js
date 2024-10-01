@@ -14,6 +14,7 @@ const gameBoard = ( function() {
 
     // Game board array
     let boardArray = [];
+    let spotsLeft = [];
 
     // Create boardArray
     function defaultBoardArray() {
@@ -21,6 +22,7 @@ const gameBoard = ( function() {
             boardArray[row] = [];
             for (let col = 0; col < BOARD_SIZE; col++) {
                 boardArray[row][col] = null;
+                spotsLeft.push(`${row}${col}`)
             }
         }
     }    
@@ -52,8 +54,14 @@ const gameBoard = ( function() {
     }
 
     function getClickCoordinates(event) {
-        let yx = event.target.dataset["index"];
+        let yx = event.target.dataset.index;
         return [ (parseInt(yx[0])), (parseInt(yx[1])) ];
+    }
+
+    function getRandomCoordinates() {
+        let xyIndex = Math.floor( Math.random() * (spotsLeft.length - 1) );
+        let yx = spotsLeft[xyIndex];
+        return [ parseInt( yx[0] ), parseInt( yx[1] ) ];
     }
 
     // Display board string
@@ -74,8 +82,13 @@ const gameBoard = ( function() {
     // Place marker (xy, marker)
     function placeMarker({marker, x, y}) {
         // Check if spot available
-        if (boardArray[y][x] === null) {
+        if (!boardArray[y][x]) {
             boardArray[y][x] = marker;
+
+            // Delete spot from spotsLeft array        
+            let xyIndex = spotsLeft.indexOf(`${y}${x}`);
+            spotsLeft.splice(xyIndex, 1);    
+
             // Spot available and marked
             return true;
         }
@@ -147,8 +160,8 @@ const gameBoard = ( function() {
 
     return {
         defaultBoardArray, getBoardArray, getClickCoordinates,
-        placeMarker, checkWinner, checkTie,
-        displayBoardArray, logBoardString, 
+        placeMarker, checkWinner, checkTie, getRandomCoordinates,
+        displayBoardArray, logBoardString,
     }
 } )();
 
@@ -172,7 +185,6 @@ function createPlayer({name, marker}) {
 // Play Game
 const game = ( function() {
     let turn;
-    let players;
     // Setup Game
     function setupGame() { 
         // Select players
@@ -239,16 +251,42 @@ const game = ( function() {
         }
 
     // Playround
-    function playRound( {x, y} ) {
-        let marker = players[`p${turn}`].marker;
+    function playRound( event ) {
+        let [y, x] = gameBoard.getClickCoordinates(event);
+        let marker = players[`p${turn}`].getMarker();
 
-        gameBoard.placeMarker( {marker, x, y} );
+        if ( !gameBoard.placeMarker( {marker, x, y} ) ) { return }
+
+        gameBoard.displayBoardArray();
+        gameBoard.logBoardString();
+
+
+        let result;
+        if (gameBoard.checkWinner({x, y})) {
+            result = `${players[`p${turn}`].getName()} Wins!!!!`;
+        }
+
+        else if (gameBoard.checkTie()) {
+            result = "Ohh, it's a TIE!!!";
+        };
+
+        turn = (turn == 1) ? 2 : 1;
+        return result;      
+    }
+
+    // PlayRoundAI
+    function playRoundAI() {
+        marker = "o";
+        let [y, x] = gameBoard.getRandomCoordinates();
+
+        if ( !gameBoard.placeMarker( {marker, x, y} ) ) { return }
+
         gameBoard.displayBoardArray();
         gameBoard.logBoardString();
 
         let result;
         if (gameBoard.checkWinner({x, y})) {
-            result = `${players[`p${turn}`].getName()} Wins!!!!`;
+            result = (turn == 1) ? "You win!" : "Computer Wins!"
         }
 
         else if (gameBoard.checkTie()) {
@@ -285,19 +323,24 @@ const game = ( function() {
         
     }
     
-    return { setupGame, playGame, playRound }
+    return { setupGame, playGame, playRound, playRoundAI }
 } )();
 
 
-// game.setupGame();
-// game.playGame();
-
 game.setupGame()
-
+let result;
+let modeAI;
+// let modeAI = true;
 spots.forEach((spot) => ( spot.addEventListener('click', (event) => {
-    let [y, x] = gameBoard.getClickCoordinates(event);
-    let result = game.playRound( {y, x} );
+    if (result) { return }
+    
+    result = game.playRound( event );
 
+    // If not win and Computer's turn
+    if (modeAI && !result) {
+        result = game.playRoundAI();
+    }
+    // Inmediate computer turn
     if (result) {
         log(result);
         alert(result);
