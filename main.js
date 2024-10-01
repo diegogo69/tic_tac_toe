@@ -2,9 +2,6 @@ const log = console.log;
 log("hello world");
 
 let players;
-const grid = document.querySelector(".grid-container");
-const spots = grid.querySelectorAll(".spot");
-
 
 // Board Object: controls the board, data and functionality
 const gameBoard = ( function() {
@@ -185,20 +182,38 @@ const game = ( function() {
     let turn;
     let players;
     let modePvP;
+    let result;
+    let boardActive = false;
     // Setup Game
     function setupGame( { p1, p2, pvp } ) { 
         // Select players
-        // players = selectPlayers();
         players = { p1, p2 };
         modePvP =  pvp;
         // Select turn
-        // turn = selectTurn()
         turn = Math.floor( Math.random() + 1 );
         // Make board
         gameBoard.defaultBoardArray();
         gameBoard.displayBoardArray();
-        gameDOM.turnBoard();
         gameBoard.logBoardString();
+        // If board spots has no event handlers yet
+        if (!boardActive) {
+             gameDOM.turnBoard();
+             boardActive = true;
+            }
+        // If previous game played. reset result
+        if (result) { result = false }
+    }
+
+    function selectMarker() {
+        let marker;
+        do {
+            marker = prompt(
+                `${"Player one"} choose a marker:\n
+                1. x
+                2. o`);
+                if ( !marker ) { marker = "x" }
+        } while ( !marker.match(/^[xo12]/i) );
+        return marker
     }
 
     function selectPlayers() {
@@ -217,18 +232,6 @@ const game = ( function() {
         const p1 = createPlayer({ name: p1Name, marker: p1Marker })
         const p2 = createPlayer({ name: p2Name, marker: p2Marker })
         return {p1, p2}
-    }
-
-    function selectMarker() {
-        let marker;
-        do {
-            marker = prompt(
-                `${"Player one"} choose a marker:\n
-                1. x
-                2. o`);
-                if ( !marker ) { marker = "x" }
-        } while ( !marker.match(/^[xo12]/i) );
-        return marker
     }
 
     function selectTurn() {
@@ -276,10 +279,13 @@ const game = ( function() {
         gameBoard.displayBoardArray();
         gameBoard.logBoardString();
 
-
         // let result;
         if (gameBoard.checkWinner({x, y})) {
-            result = `${players[`p${turn}`].getName()} Wins!!!!`;
+            if (!modePvP && turn == 1) {
+                result = `You Win!!!!`;
+            } else {
+                result = `${players[`p${turn}`].getName()} Wins!!!!`;
+            }
         }
 
         else if (gameBoard.checkTie()) {
@@ -335,14 +341,10 @@ const game = ( function() {
     return { setupGame, playGame, playTurn, spotEventHandler }
 } )();
 
-let result;
-// game.setupGame()
-// let result;
-// let modeAI;
-// modeAI = true;
-
-
 const gameDOM = ( function() {
+    const grid = document.querySelector(".grid-container");
+    const spots = grid.querySelectorAll(".spot");
+
     function turnBoard() {
         spots.forEach( (spot) => (
             spot.addEventListener('click', (event) => game.spotEventHandler(event))
@@ -350,7 +352,6 @@ const gameDOM = ( function() {
     }
 
     // Setup PvP
-    // Listen play button
     const btnPlayPvP = document.querySelector('#btnPlayPvP');
     const formPlayPvP = document.querySelector('#formPlayPvP');
     btnPlayPvP.addEventListener('click', event => {
@@ -373,10 +374,22 @@ const gameDOM = ( function() {
         
     });
 
+    const btnPlayPvC = document.querySelector('#btnPlayPvC');
+    const formPlayPvC = document.querySelector('#formPlayPvC');
+    btnPlayPvC.addEventListener('click', event => {
+
+        event.preventDefault();
+
+        const p1 = createPlayer({ name: "You", marker: "x" });
+        const p2 = createPlayer({ name: "Computer", marker: "o" });
+
+        let pvp = false;
+
+        game.setupGame( {p1, p2, pvp} );
+        
+    });
+
     return {
         turnBoard,
     }
-
 } )()
-
-
