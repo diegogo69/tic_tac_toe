@@ -53,11 +53,12 @@ const gameBoard = ( function() {
         console.log(getBoardString())
     }
 
+    // Event triggered get the spot clicked
     function getClickCoordinates(event) {
         let yx = event.target.dataset.index;
         return [ (parseInt(yx[0])), (parseInt(yx[1])) ];
     }
-
+    // Get random coordinates use for computer turn
     function getRandomCoordinates() {
         let xyIndex = Math.floor( Math.random() * (spotsLeft.length - 1) );
         let yx = spotsLeft[xyIndex];
@@ -167,7 +168,6 @@ const gameBoard = ( function() {
 
 // Player Object: contains the player data and functionality
 function createPlayer({name, marker}) {
-
     // Marker
     function getMarker() {
         return marker;
@@ -238,11 +238,12 @@ const game = ( function() {
         return turn;
     }
 
+    // Declare valid spot expression
+    const validSpot = (x) => ( x >= 0 && x <= 2 );
+    // Prompt place. used when no GUI
     function promptPlace() {
         // Declare spot variable (YX coordinates)
         let spot;
-        // Declare valid spot expression
-        const validSpot = (x) => ( x >= 0 && x <= 2 );
         do {
             spot = prompt(`Enter spot place in XY format (e.g 00): `);
         } while ( !(validSpot(spot[0]) && validSpot(spot[1])) );
@@ -250,10 +251,21 @@ const game = ( function() {
         return [(parseInt(spot[0])), (parseInt(spot[1]))];
         }
 
-    // Playround
-    function playRound( event ) {
-        let [y, x] = gameBoard.getClickCoordinates(event);
-        let marker = players[`p${turn}`].getMarker();
+    // playTurn. Handles the logic of a single turn
+    function playTurn( event = null ) {
+        let marker;
+        let x, y;
+
+        // If event it's user triggered
+        if (event) {
+            marker = players[`p${turn}`].getMarker();            
+            [y, x] = gameBoard.getClickCoordinates(event);
+        }
+        // If not event it's Computer triggered
+        else {
+            marker = "o";
+            [y, x] = gameBoard.getRandomCoordinates();    
+        }
 
         if ( !gameBoard.placeMarker( {marker, x, y} ) ) { return }
 
@@ -264,29 +276,6 @@ const game = ( function() {
         let result;
         if (gameBoard.checkWinner({x, y})) {
             result = `${players[`p${turn}`].getName()} Wins!!!!`;
-        }
-
-        else if (gameBoard.checkTie()) {
-            result = "Ohh, it's a TIE!!!";
-        };
-
-        turn = (turn == 1) ? 2 : 1;
-        return result;      
-    }
-
-    // PlayRoundAI
-    function playRoundAI() {
-        marker = "o";
-        let [y, x] = gameBoard.getRandomCoordinates();
-
-        if ( !gameBoard.placeMarker( {marker, x, y} ) ) { return }
-
-        gameBoard.displayBoardArray();
-        gameBoard.logBoardString();
-
-        let result;
-        if (gameBoard.checkWinner({x, y})) {
-            result = (turn == 1) ? "You win!" : "Computer Wins!"
         }
 
         else if (gameBoard.checkTie()) {
@@ -320,25 +309,24 @@ const game = ( function() {
 
             turn = (turn == 1) ? 2 : 1;
         }
-        
     }
     
-    return { setupGame, playGame, playRound, playRoundAI }
+    return { setupGame, playGame, playTurn, }
 } )();
 
 
 game.setupGame()
 let result;
 let modeAI;
-// let modeAI = true;
+modeAI = true;
 spots.forEach((spot) => ( spot.addEventListener('click', (event) => {
     if (result) { return }
     
-    result = game.playRound( event );
+    result = game.playTurn( event );
 
     // If not win and Computer's turn
     if (modeAI && !result) {
-        result = game.playRoundAI();
+        result = game.playTurn();
     }
     // Inmediate computer turn
     if (result) {
