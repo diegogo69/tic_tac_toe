@@ -2,6 +2,10 @@ const log = console.log;
 log("hello world");
 
 let players;
+const resultText = document.querySelector(".result-wrapper");
+const grid = document.querySelector(".grid-container");
+const spots = grid.querySelectorAll(".spot");
+
 
 // Board Object: controls the board, data and functionality
 const gameBoard = ( function() {
@@ -184,6 +188,10 @@ const game = ( function() {
     let modePvP;
     let result;
     let boardActive = false;
+
+    // Declare valid spot expression
+    const validSpot = (x) => ( x >= 0 && x <= 2 );
+
     // Setup Game
     function setupGame( { p1, p2, pvp } ) { 
         // Select players
@@ -201,62 +209,11 @@ const game = ( function() {
              boardActive = true;
             }
         // If previous game played. reset result
-        if (result) { result = false }
-    }
-
-    function selectMarker() {
-        let marker;
-        do {
-            marker = prompt(
-                `${"Player one"} choose a marker:\n
-                1. x
-                2. o`);
-                if ( !marker ) { marker = "x" }
-        } while ( !marker.match(/^[xo12]/i) );
-        return marker
-    }
-
-    function selectPlayers() {
-        // Select players name 
-        let p1Name = prompt("P1 name: ");
-        if (!p1Name) { p1Name = "Player 1" }
-        let p2Name = prompt("P2 name: ");
-        if (!p2Name) { p2Name = "Player 2" }
-        
-        // Select marker
-        const marker = selectMarker();
-        // Set markers
-        const p1Marker = (marker == "1" || marker == "x") ? "x" : "o";
-        const p2Marker = (marker == "1" || marker == "x") ? "o" : "x";
-        
-        const p1 = createPlayer({ name: p1Name, marker: p1Marker })
-        const p2 = createPlayer({ name: p2Name, marker: p2Marker })
-        return {p1, p2}
-    }
-
-    function selectTurn() {
-        do {
-            turn = prompt(
-                `Who marks first? Enter an option (1 or 2)\n
-                1. Player 1
-                2. Player 2`);
-            if ( !turn ) { turn = "1" }
-        } while (turn != 1 && turn != 2);
-        return turn;
-    }
-
-    // Declare valid spot expression
-    const validSpot = (x) => ( x >= 0 && x <= 2 );
-    // Prompt place. used when no GUI
-    function promptPlace() {
-        // Declare spot variable (YX coordinates)
-        let spot;
-        do {
-            spot = prompt(`Enter spot place in XY format (e.g 00): `);
-        } while ( !(validSpot(spot[0]) && validSpot(spot[1])) );
-
-        return [(parseInt(spot[0])), (parseInt(spot[1]))];
+        if (result) {
+            result = false;
+            resultText.textContent = "";
         }
+    }
 
     // playTurn. Handles the logic of a single turn
     function playTurn( event = null ) {
@@ -296,31 +253,6 @@ const game = ( function() {
         return result;      
     }
 
-    function playGame() {
-        gameBoard.displayBoardArray();
-        gameBoard.logBoardString();
-
-        while (!result) {
-            let marker =  (turn == 1) ? players.p1.getMarker() : players.p2.getMarker();
-            // let y, x;
-            let [y, x] = promptPlace();
-            gameBoard.placeMarker( {marker, x, y} );
-            gameBoard.logBoardString();
-
-            if (gameBoard.checkWinner({x, y})) {
-                log(`${players[`p${turn}`].getName()} Wins!!!!`);
-                return;
-            };
-
-            if (gameBoard.checkTie()) {
-                log("Ohh, it's a TIE!!!")
-                return;
-            };
-
-            turn = (turn == 1) ? 2 : 1;
-        }
-    }
-
     // DOM 
     function spotEventHandler(event) {
         if (result) { return }
@@ -334,14 +266,13 @@ const game = ( function() {
         // Inmediate computer turn
         if (result) {
             log(result);
-            alert(result);
+            // alert(result);
+            resultText.textContent = result;
         }
     }    
     
-    return { setupGame, playGame, playTurn, spotEventHandler }
+    return { setupGame, playTurn, spotEventHandler }
 } )();
-const grid = document.querySelector(".grid-container");
-const spots = grid.querySelectorAll(".spot");
 
 const gameDOM = ( function() {
 
