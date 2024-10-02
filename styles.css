@@ -236,6 +236,7 @@ body {
 	--shadow-color: #1b7275;
 
 	height: 100vh;
+	height: 100svh;
 	display: flex;
 	flex-direction: column;
 
@@ -251,8 +252,8 @@ footer {
 }
 
 header {
-	height: 4rem;
-	padding: 0.5rem 1rem;
+	height: 3.2rem;
+	padding: 0.2rem 0.8rem;
 }
 
 footer {
@@ -266,16 +267,18 @@ main {
 	padding: 1rem;
 
 	display: flex;
+	align-content: flex-start;
 	flex-wrap: wrap;
 	justify-content: center;
 }
 
 .grid-section {
-	padding: 1rem;
+	margin-bottom: .8rem;
 	display: flex;
+	aspect-ratio: 1 / 1;
+	min-width: 240px;
 
-	width: clamp(340px, 280px + 10vw, 400px);
-	height: clamp(340px, 280px + 10vw, 400px);
+	width: clamp(240px, 220px + 10vw, 400px);
 
 }
 
@@ -296,6 +299,7 @@ main {
 	background-color: var(--light-color);
 	display: grid;
 	place-content: center;
+	user-select: none;
 }
 
 .play-game-wrapper {
@@ -313,7 +317,7 @@ form {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: .8rem;
+	gap: .6rem;
 }
 
 form ul {
@@ -348,8 +352,11 @@ input[type="text"]::placeholder {
 .heading {
 	font-size: 1.2rem;
 	font-weight: 900;
+	min-width: 290px;
 
 	display: flex;
+	justify-content: center;
+
 	align-items: center;
 	/* gap: 1rem; */
 }
