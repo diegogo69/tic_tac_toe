@@ -5,45 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La vieja | Tic Tac Toe</title>
 
+    <style>
+        svg { 
+            box-sizing: content-box;
+            width: 2rem;
+        }
+    </style>
+
     <link rel="stylesheet" href="styles.css">
     <script src="main.js" defer></script>
+
 </head>
 <body>
     <header>
-        La Vieja
+        <h1><em>La Vieja</em> (Tic Tac Toe)</h1>
     </header>    
 
     <main>
-        <div class="grid-container">
-            <div class="spot" data-index="00">x</div>
-            <div class="spot" data-index="01">x</div>
-            <div class="spot" data-index="02">o</div>
-            <div class="spot" data-index="10">x</div>
-            <div class="spot" data-index="11">x</div>
-            <div class="spot" data-index="12">x</div>
-            <div class="spot" data-index="20">x</div>
-            <div class="spot" data-index="21">o</div>
-            <div class="spot" data-index="22">x</div>
+        <div class="grid-section">
+            <div class="grid-container">
+                <div class="spot" data-index="00">x</div>
+                <div class="spot" data-index="01">x</div>
+                <div class="spot" data-index="02">o</div>
+                <div class="spot" data-index="10">x</div>
+                <div class="spot" data-index="11">x</div>
+                <div class="spot" data-index="12">x</div>
+                <div class="spot" data-index="20">x</div>
+                <div class="spot" data-index="21">o</div>
+                <div class="spot" data-index="22">x</div>
+            </div>
         </div>
 
         <div class="play-game-wrapper">
             
-            <form class="game-mode-form">
-                <h3>Player vs Computer</h3>
+            
+            <form id="formPlayPvC" class="hidden">
+
+                <div class="heading">
+                    <!-- left -->
+                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <title>Change game mode</title>
+                        <path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" />
+                    </svg>
+
+                    Player vs Computer
+
+                    <!-- right -->
+                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <title>Change game mode</title>
+                        <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
+                    </svg>                    
+                </div>
+
+                <button id="btnPlayPvC">Play</button>
                 <input type="hidden" name="game-mode" value="two-players">
             </form>
             
             
             <form id="formPlayPvP">
+
+                <div class="heading">
+                    <!-- left -->
+                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <title>Change game mode</title>
+                        <path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" />
+                    </svg>
+
+                    Player vs Player
+
+                    <!-- right -->
+                    <svg class="arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <title>Change game mode</title>
+                        <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
+                    </svg>                    
+                </div>
+
                 <button id="btnPlayPvP">Play</button>
                 <ul>
                     <li>
-                        <label for="p1-name">Player 1</label>
-                        <input type="text" name="p1-name" id="p1-name" value="Player 1">
+                        <label for="p1-name">Player 1:</label>
+                        <input type="text" name="p1-name" id="p1-name" placeholder="x-men">
                     </li>
                     <li>
-                        <label for="p2-name">Player 2</label>
-                        <input type="text" name="p2-name" id="p2-name" value="Player 2">
+                        <label for="p2-name">Player 2:</label>
+                        <input type="text" name="p2-name" id="p2-name" placeholder="o-some">
                     </li>
                 </ul>
                 <input type="hidden" name="game-mode" value="two-players">
@@ -52,7 +97,7 @@
     </main>
 
     <footer>
-    
+        Github: <a href="https://github.com/diegogo69">DiegoGo69</a>
     </footer>
 </body>
 </html>
