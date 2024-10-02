@@ -1,5 +1,20 @@
 const log = console.log;
 
+// Player Object: contains the player data and functionality
+function createPlayer({name, marker}) {
+    // Marker
+    function getMarker() {
+        return marker;
+    }
+    // Name
+    function getName() {
+        return name;
+    }
+    return {getMarker, getName}   
+};
+
+
+
 // Board Object: controls the board, data and functionality
 const gameBoard = ( function() {
     
@@ -99,7 +114,7 @@ const gameBoard = ( function() {
     }
 
     function checkWinner({x, y}) {
-        // current spot is equal to next spot
+        // Check if current spot is equal to next spot
         const sucesiveSpots = (currentSpot, nextSpot) => (currentSpot !== null && currentSpot === nextSpot);
         // For each method in checkCross (row, colum, diagonal)
         for (let prop in checkCross) {
@@ -167,19 +182,6 @@ const gameBoard = ( function() {
     }
 } )();
 
-// Player Object: contains the player data and functionality
-function createPlayer({name, marker}) {
-    // Marker
-    function getMarker() {
-        return marker;
-    }
-    // Name
-    function getName() {
-        return name;
-    }
-    return {getMarker, getName}   
-};
-
 
 // Play Game
 const game = ( function() {
@@ -195,7 +197,9 @@ const game = ( function() {
         players = { p1, p2 };
         modePvP =  pvp;
         // Select turn
-        turn = Math.floor( Math.random() + 1 );
+        // turn = Math.floor( Math.random() + 1 );
+        turn = Math.round( Math.random() + 1 );
+
         // Make board
         gameBoard.defaultBoardArray();
         gameBoard.displayBoardArray();
@@ -206,10 +210,8 @@ const game = ( function() {
              boardActive = true;
             }
         // If previous game played. reset result
-        if (result) {
-            result = false;
-            gameDOM.resultText.textContent = "";
-        }
+        result = false;
+        gameDOM.resultText.textContent = "";
     }
 
     // playTurn. Handles the logic of a single turn
@@ -300,11 +302,11 @@ const gameDOM = ( function() {
         event.preventDefault();
 
         // Get players name
-        let p1Name = formPlayPvP.querySelector('#p1Name');
-        let p2Name = formPlayPvP.querySelector('#p2Name');
+        let p1Name = formPlayPvP.querySelector('#p1-name').value;
+        let p2Name = formPlayPvP.querySelector('#p2-name').value;
 
-        if (!p1Name) { p1Name = "Player 1"};
-        if (!p2Name) { p2Name = "Player 2"};
+        if (!p1Name) { p1Name = "Player 1" };
+        if (!p2Name) { p2Name = "Player 2" };
 
         const p1 = createPlayer({ name: p1Name, marker: "x" });
         const p2 = createPlayer({ name: p2Name, marker: "o" });
