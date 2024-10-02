@@ -197,8 +197,7 @@ const game = ( function() {
         players = { p1, p2 };
         modePvP =  pvp;
         // Select turn
-        // turn = Math.floor( Math.random() + 1 );
-        turn = Math.round( Math.random() + 1 );
+        turn = Math.floor( Math.random() + 1 );
 
         // Make board
         gameBoard.defaultBoardArray();
