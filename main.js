@@ -340,10 +340,18 @@ const game = ( function() {
     
     return { setupGame, playGame, playTurn, spotEventHandler }
 } )();
+const grid = document.querySelector(".grid-container");
+const spots = grid.querySelectorAll(".spot");
 
 const gameDOM = ( function() {
-    const grid = document.querySelector(".grid-container");
-    const spots = grid.querySelectorAll(".spot");
+
+    const arrows = document.querySelectorAll('.arrow');
+    for (let arrow of arrows) {
+        arrow.addEventListener('click', event => {
+            formPlayPvP.classList.toggle('hidden');
+            formPlayPvC.classList.toggle('hidden');
+        })
+    }
 
     function turnBoard() {
         spots.forEach( (spot) => (
