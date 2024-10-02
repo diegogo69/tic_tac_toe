@@ -1,5 +1,4 @@
 const log = console.log;
-log("hello world");
 
 // Board Object: controls the board, data and functionality
 const gameBoard = ( function() {
@@ -272,6 +271,7 @@ const game = ( function() {
     return { setupGame, playTurn, spotEventHandler }
 } )();
 
+// Define DOM elements and event handlers
 const gameDOM = ( function() {
     const resultText = document.querySelector(".result-wrapper");
     const grid = document.querySelector(".grid-container");
@@ -291,9 +291,10 @@ const gameDOM = ( function() {
         ) );
     }
 
-    // Setup PvP
+    // Player vs Player DOM elements
     const btnPlayPvP = document.querySelector('#btnPlayPvP');
     const formPlayPvP = document.querySelector('#formPlayPvP');
+    // Setup PvP
     btnPlayPvP.addEventListener('click', event => {
 
         event.preventDefault();
@@ -314,8 +315,10 @@ const gameDOM = ( function() {
         
     });
 
+    // Player vs computer DOM elemens
     const btnPlayPvC = document.querySelector('#btnPlayPvC');
     const formPlayPvC = document.querySelector('#formPlayPvC');
+    // Setup PvC
     btnPlayPvC.addEventListener('click', event => {
 
         event.preventDefault();
