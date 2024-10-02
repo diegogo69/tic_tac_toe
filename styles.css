@@ -388,9 +388,11 @@ button:active {
 }
 
 details {
+	text-align: center;
 	margin-top: .8rem;
 }
 
 p {
 	max-width: 42ch;
+	text-align: left;
 }
