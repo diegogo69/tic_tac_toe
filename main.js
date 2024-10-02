@@ -1,17 +1,14 @@
 const log = console.log;
 log("hello world");
 
-let players;
-const resultText = document.querySelector(".result-wrapper");
-const grid = document.querySelector(".grid-container");
-const spots = grid.querySelectorAll(".spot");
-
-
 // Board Object: controls the board, data and functionality
 const gameBoard = ( function() {
     
     // Rows and Columns constant values
     const BOARD_SIZE = 3;
+
+    // Declare valid spot expression
+    const validSpot = (x) => ( x >= 0 && x <= 2 );
 
     // Game board array
     let boardArray = [];
@@ -57,7 +54,11 @@ const gameBoard = ( function() {
     // Event triggered get the spot clicked
     function getClickCoordinates(event) {
         let yx = event.target.dataset.index;
-        return [ (parseInt(yx[0])), (parseInt(yx[1])) ];
+        let [y, x] = [ (parseInt(yx[0])), (parseInt(yx[1])) ];
+        if (validSpot(y) && validSpot(x)) {
+            return [y, x]
+        }
+        return ;
     }
     // Get random coordinates use for computer turn
     function getRandomCoordinates() {
@@ -74,7 +75,7 @@ const gameBoard = ( function() {
                 // BOARD_SIZE * 0 = 0 -> 0 + 0 | 0 + 1 | 0 + 2
                 // BOARD_SIZE * 1 = 3 -> 3 + 0 | 3 + 1 | 3 + 2
                 // BOARD_SIZE * 2 = 6 -> 6 + 0 | 6 + 1 | 6 + 2
-                let spot = spots[BOARD_SIZE * y + x];
+                let spot = gameDOM.spots[BOARD_SIZE * y + x];
 
                 spot.textContent = boardArray[y][x];
             }
@@ -189,9 +190,6 @@ const game = ( function() {
     let result;
     let boardActive = false;
 
-    // Declare valid spot expression
-    const validSpot = (x) => ( x >= 0 && x <= 2 );
-
     // Setup Game
     function setupGame( { p1, p2, pvp } ) { 
         // Select players
@@ -211,7 +209,7 @@ const game = ( function() {
         // If previous game played. reset result
         if (result) {
             result = false;
-            resultText.textContent = "";
+            gameDOM.resultText.textContent = "";
         }
     }
 
@@ -267,7 +265,7 @@ const game = ( function() {
         if (result) {
             log(result);
             // alert(result);
-            resultText.textContent = result;
+            gameDOM.resultText.textContent = result;
         }
     }    
     
@@ -275,6 +273,9 @@ const game = ( function() {
 } )();
 
 const gameDOM = ( function() {
+    const resultText = document.querySelector(".result-wrapper");
+    const grid = document.querySelector(".grid-container");
+    const spots = grid.querySelectorAll(".spot");    
 
     const arrows = document.querySelectorAll('.arrow');
     for (let arrow of arrows) {
@@ -329,6 +330,6 @@ const gameDOM = ( function() {
     });
 
     return {
-        turnBoard,
+        turnBoard, resultText, spots,
     }
 } )()
